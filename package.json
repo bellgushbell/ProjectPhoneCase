@@ -17,7 +17,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "dev": "nodemon server.js",
     "resetDB": "node prisma/resetDB.js",
     "start": "node server.js"
   },
