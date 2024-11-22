@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int             @id @default(autoincrement()) @map("user_id")
+  email        String?         @unique
+  firstName    String
+  lastName     String
+  password     String
+  profileImage String?
+  role         Role            @default(USER)
+  shoppingCart Shopping_Cart[]
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Shopping_Cart {
+  id         Int         @id @default(autoincrement()) @map("shopping_cart_id")
+  userId     Int         @map("user_id")
+  isCheckout Boolean     @default(false)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItems  Cart_Item[]
+  order      Order?
+}
+
+model Cart_Item {
+  id             Int           @id @default(autoincrement()) @map("cart_item_id")
+  productId      Int           @map("product_id")
+  shoppingCartId Int           @map("shopping_cart_id")
+  amount         Int
+  price          Decimal       @db.Decimal(10, 2)
+  shoppingCart   Shopping_Cart @relation(fields: [shoppingCartId], references: [id], onDelete: Cascade)
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id          Int         @id @default(autoincrement()) @map("product_id")
+  name        String
+  price       Decimal     @db.Decimal(10, 2)
+  imageUrl    String      @map("image_url")
+  description String?
+  stock       Int
+  categoryId  Int         @map("category_id")
+  isDelete    Boolean     @default(false)
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  cart_Item   Cart_Item[]
+}
+
+model Category {
+  id           Int       @id @default(autoincrement()) @map("category_id")
+  categoryName String    @map("category_name")
+  products     Product[]
+}
+
+model Order {
+  id             Int           @id @default(autoincrement()) @map("order_id")
+  userId         Int           @map("user_id")
+  totalPrice     Decimal       @db.Decimal(10, 2)
+  status         OrderStatus   @map("order_status")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  shoppingCartId Int           @unique @map("shopping_cart_id")
+  shoppingCart   Shopping_Cart @relation(fields: [shoppingCartId], references: [id], onDelete: Cascade)
+  payments       Payment[]
+}
+
+model Payment {
+  id             Int           @id @default(autoincrement()) @map("payment_id")
+  orderId        Int           @map("order_id")
+  status         PaymentStatus @map("payment_status")
+  payment_method PaymentMethod
+  imgPayment     String        @map("SlipIMG")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  SCAN
+  BANK
+}
