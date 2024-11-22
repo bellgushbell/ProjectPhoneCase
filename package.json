@@ -19,8 +19,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "resetDB": "node prisma/resetDB.js",
-    "start": "node server.js",
-    "build": "echo 'No build step required'"
+    "start": "node server.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
