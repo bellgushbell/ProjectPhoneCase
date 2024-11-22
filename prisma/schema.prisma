@@ -24,6 +24,8 @@ model User {
   shoppingCart Shopping_Cart[]
   createdAt    DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  @@map("user")
 }
 
 enum Role {
@@ -38,6 +40,8 @@ model Shopping_Cart {
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   cartItems  Cart_Item[]
   order      Order?
+
+  @@map("shopping_cart")
 }
 
 model Cart_Item {
@@ -48,6 +52,8 @@ model Cart_Item {
   price          Decimal       @db.Decimal(10, 2)
   shoppingCart   Shopping_Cart @relation(fields: [shoppingCartId], references: [id], onDelete: Cascade)
   product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("cart_item")
 }
 
 model Product {
@@ -61,12 +67,16 @@ model Product {
   isDelete    Boolean     @default(false)
   category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   cart_Item   Cart_Item[]
+
+  @@map("product")
 }
 
 model Category {
   id           Int       @id @default(autoincrement()) @map("category_id")
   categoryName String    @map("category_name")
   products     Product[]
+
+  @@map("category")
 }
 
 model Order {
@@ -79,6 +89,8 @@ model Order {
   shoppingCartId Int           @unique @map("shopping_cart_id")
   shoppingCart   Shopping_Cart @relation(fields: [shoppingCartId], references: [id], onDelete: Cascade)
   payments       Payment[]
+
+  @@map("order")
 }
 
 model Payment {
@@ -90,6 +102,8 @@ model Payment {
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
   order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payment")
 }
 
 enum PaymentStatus {
